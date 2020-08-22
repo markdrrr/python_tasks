@@ -1,27 +1,26 @@
-from task_13_02.func import Func
-from task_13_02.exceptions import *
+from calculator.func_logic import *
+import re
 
 
-class Calculate:
+class UiFunc:
     @staticmethod
-    def run():
-        while True:
+    def user_in_out():
+        in_input = False
+        while not in_input:
+            str_input = input()
+            digit_list = re.split(r"[+\-*/]", str_input)
             try:
-                first = int(input('Введите число: '))
-                oprt = False
-                while not oprt:
-                    fnc = input('Введите знак операции: ')
-                    try:
-                        if fnc not in ['+', '-', '*', '/']:
-                            raise OperationError('Неизвестный оператор !')
-                        else:
-                            oprt = True
-                    except OperationError as error:
-                        print(error)
-                second = int(input('Введите второе число: '))
+                digit_list = list(map(lambda x: int(x), digit_list))
             except ValueError:
-                print('Введите целое цисло !')
+                print('Неверная операция')
+                continue
             else:
-                result = Func(first, second, fnc).process()
-                if result:
-                    print('Результат: ', result)
+                in_input = True
+            if len(digit_list) < 2:  # если введино только одно число
+                print(digit_list[0])
+                continue
+            oprt_list = re.findall(r'[+\-*/]', str_input)
+            oprt = FuncLogic(digit_list, oprt_list)
+            result = oprt.doit()
+            if result:
+                print('Результат', result)
