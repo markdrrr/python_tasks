@@ -1,27 +1,34 @@
-from task_13_02.func import Func
-from task_13_02.exceptions import *
+from calculator.func_logic import *
+from calculator.exceptions import *
+import re
 
 
-class Calculate:
+class UiFunc:
     @staticmethod
-    def run():
-        while True:
+    def user_in_out():
+        in_input = False
+        while not in_input:
+            str_input = input()
+
+            # проверка на неизвестные символы
+            error_symbol = re.findall(r'[^-+/*\d+?:\.\d+\s]', str_input)
             try:
-                first = int(input('Введите число: '))
-                oprt = False
-                while not oprt:
-                    fnc = input('Введите знак операции: ')
-                    try:
-                        if fnc not in ['+', '-', '*', '/']:
-                            raise OperationError('Неизвестный оператор !')
-                        else:
-                            oprt = True
-                    except OperationError as error:
-                        print(error)
-                second = int(input('Введите второе число: '))
-            except ValueError:
-                print('Введите целое цисло !')
-            else:
-                result = Func(first, second, fnc).process()
-                if result:
-                    print('Результат: ', result)
+                if error_symbol:
+                    raise UnknownSymbol
+            except UnknownSymbol as err:
+                print(err)
+                continue
+            math_list = re.findall(r'[-+/*()]|\d+(?:\.\d+)?', str_input)
+
+            # проверка на отрецательное и положительное число в начале
+            if math_list[0] == '-' or math_list[0] == '+':
+                math_list[0] += math_list[1]
+                math_list[0] = int(math_list[0])
+                math_list.pop(1)
+
+            oprt = FuncLogic(math_list)
+            result = oprt.doit()
+            if result:
+                print('Результат', result)
+            elif result == 0:
+                print('Результат', result)
