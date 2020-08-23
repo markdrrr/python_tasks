@@ -1,4 +1,5 @@
 from calculator.func_logic import *
+from calculator.exceptions import *
 import re
 
 
@@ -8,19 +9,26 @@ class UiFunc:
         in_input = False
         while not in_input:
             str_input = input()
-            digit_list = re.split(r"[+\-*/]", str_input)
+
+            # проверка на неизвестные символы
+            error_symbol = re.findall(r'[^-+/*\d+?:\.\d+\s]', str_input)
             try:
-                digit_list = list(map(lambda x: int(x), digit_list))
-            except ValueError:
-                print('Неверная операция')
+                if error_symbol:
+                    raise UnknownSymbol
+            except UnknownSymbol as err:
+                print(err)
                 continue
-            else:
-                in_input = True
-            if len(digit_list) < 2:  # если введино только одно число
-                print(digit_list[0])
-                continue
-            oprt_list = re.findall(r'[+\-*/]', str_input)
-            oprt = FuncLogic(digit_list, oprt_list)
+            math_list = re.findall(r'[-+/*()]|\d+(?:\.\d+)?', str_input)
+
+            # проверка на отрецательное и положительное число в начале
+            if math_list[0] == '-' or math_list[0] == '+':
+                math_list[0] += math_list[1]
+                math_list[0] = int(math_list[0])
+                math_list.pop(1)
+
+            oprt = FuncLogic(math_list)
             result = oprt.doit()
             if result:
+                print('Результат', result)
+            elif result == 0:
                 print('Результат', result)
