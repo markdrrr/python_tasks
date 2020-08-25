@@ -1,4 +1,4 @@
-from calculator.func import Func
+from func import Func
 
 
 class FuncLogic:
