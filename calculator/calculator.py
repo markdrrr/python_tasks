@@ -1,7 +1,7 @@
 """
-Calculator v0.4
+Calculator v0.5
 """
-from ui_func import UiFunc
+from ui_func import *
 import sys
 
 def main(user_input):
@@ -10,7 +10,8 @@ def main(user_input):
     else:
         user_input = user_input[1]
     print(user_input)
-    UiFunc.user_in_out(user_input)
+    res = UiFunc.user_in_out(user_input)
+    print(res)
 
 
 if __name__ == "__main__":

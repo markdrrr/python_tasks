@@ -1,13 +1,19 @@
 from func import Func
+from exceptions import *
+
+count = 1
 
 
 class FuncLogic:
+    count = 1  # счетчик для принта разложение операций по очереди
+
     def __init__(self, math_list):
         self.math_list = math_list
+        self.count = 1
 
     def doit(self):
+        global count
         result = self.math_list[0]  # на случай если пришло только одно значение
-        count = 1  # счетчик для принта разложение операций по очереди
 
         # проверяем на дробные и целые числа и перезаписываем в список
         for i in range(len(self.math_list)):
@@ -47,9 +53,16 @@ class FuncLogic:
             return f.mult(arg1, arg2)
         elif oprt == '/':
             return f.divide(arg1, arg2)
+        elif oprt == '**':
+            return f.power(arg1, arg2)
 
     def preority(self):
-        if '*' in self.math_list or '/' in self.math_list:
+        if '**' in self.math_list:
+            for i in range(len(self.math_list)):
+                if self.math_list[i] == '**':
+                    index = i
+                    return index
+        elif '*' in self.math_list or '/' in self.math_list:
             for i in range(len(self.math_list)):
                 if self.math_list[i] == '*':
                     index = i
@@ -59,3 +72,44 @@ class FuncLogic:
                     return index
         else:
             return 1
+
+    # проверяем что бы скобки были парные
+    @staticmethod
+    def paired_brackets(lst):
+        sum1 = sum2 = 0
+        for el in lst:
+            if el == '(':
+                sum1 += 1
+            elif el == ')':
+                sum2 += 1
+        return True if sum1 == sum2 else False
+
+    @staticmethod
+    def ping_pong(lst):
+        # проверяем парные ли скобки, верно ли они расположены
+        # и возвращаем индекс и конец скобок в списке
+        start, finish = FuncLogic.start_finish_skobki(lst)
+        new_lst = lst[start + 1:finish]  # значение из скобок
+        new_oprt = FuncLogic(new_lst)
+        result = new_oprt.doit()  # производим операцию со значением взятых из скобок
+        lst[start] = result  # перезаписываем результат вычисления из скобок в индекс
+        sum_remove_numbers = finish - start
+        new_dlina_lst = len(lst) - sum_remove_numbers
+        while len(lst) > new_dlina_lst:  # удаляем индексы значений над которыми произвели операцию
+            lst.pop(start + 1)
+
+    @staticmethod
+    def start_finish_skobki(lst):
+        if FuncLogic.paired_brackets(lst):  # проверяем что бы скобки были парные
+            # ищем начало и конец скобок
+            for i in range(len(lst)):
+                if lst[i] == ')':
+                    finish = i
+                    for z in range(finish + 1):
+                        if lst[finish - z] == '(':
+                            start = finish - z
+                            return start, finish
+                        elif finish - z == 0:
+                            raise IncorrectParentheses
+        else:
+            raise NotPairedBrackets

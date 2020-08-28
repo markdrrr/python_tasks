@@ -16,3 +16,6 @@ class Func:
             print('На ноль делить нельзя')
         else:
             return result
+
+    def power(self, arg1, arg2):
+        return arg1 ** arg2
